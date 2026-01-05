@@ -38,6 +38,10 @@ class SpotiLoaderApp {
   }
 
   setupApp() {
+    // Debug: Log the NODE_ENV value
+    console.log('NODE_ENV:', process.env.NODE_ENV);
+    console.log('VITE_DEV:', process.env.VITE_DEV);
+
     // Register the custom protocol
     if (process.defaultApp) {
       if (process.argv.length >= 2) {
@@ -48,7 +52,10 @@ class SpotiLoaderApp {
     }
 
     // Enable live reload for development
-    if (process.env.NODE_ENV === 'development') {
+    const isDev = process.env.NODE_ENV === 'development' || process.env.VITE_DEV === 'true';
+
+    if (isDev) {
+      console.log('Development mode detected, setting up hot reload');
       try {
         require('electron-reload')(__dirname, {
           electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron'),
@@ -108,10 +115,18 @@ class SpotiLoaderApp {
       this.mainWindow.show();
     });
 
-    if (process.env.NODE_ENV === 'development') {
+    // Debug: Log the NODE_ENV value
+    console.log('NODE_ENV:', process.env.NODE_ENV);
+
+    // Check for development mode
+    const isDev = process.env.NODE_ENV === 'development' || process.env.VITE_DEV === 'true';
+
+    if (isDev) {
+      console.log('Loading from dev server: http://localhost:5173');
       this.mainWindow.loadURL('http://localhost:5173');
       this.mainWindow.webContents.openDevTools();
     } else {
+      console.log('Loading from dist:', path.join(__dirname, '../../dist/index.html'));
       this.mainWindow.loadFile(path.join(__dirname, '../../dist/index.html'));
     }
   }
