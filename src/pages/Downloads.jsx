@@ -15,7 +15,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import ProgressBar from '../components/ProgressBar';
-import { useDownload } from '../hooks/useDownloader';
+import { useDownload } from '../hooks/useDownloader.jsx';
 
 const Downloads = () => {
   const { 

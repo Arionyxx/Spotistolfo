@@ -12,7 +12,7 @@ import {
   Heart,
   Download
 } from 'lucide-react';
-import { useDownload } from '../hooks/useDownloader';
+import { useDownload } from '../hooks/useDownloader.jsx';
 
 const SongRow = ({ 
   track, 

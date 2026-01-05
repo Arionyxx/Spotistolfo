@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AuthProvider, useAuth } from './hooks/useSpotifyAuth';
-import { DownloadProvider } from './hooks/useDownloader';
+import { AuthProvider, useAuth } from './hooks/useSpotifyAuth.jsx';
+import { DownloadProvider } from './hooks/useDownloader.jsx';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './pages/Dashboard';

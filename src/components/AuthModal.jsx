@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Music, LogIn, Settings, X } from 'lucide-react';
-import { useAuth } from '../hooks/useSpotifyAuth';
+import { useAuth } from '../hooks/useSpotifyAuth.jsx';
 import LoadingSpinner from './LoadingSpinner';
 
 const AuthModal = () => {
