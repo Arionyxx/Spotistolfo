@@ -11,12 +11,7 @@ const AuthModal = () => {
   const [clientSecret, setClientSecret] = useState('');
 
   const handleLogin = async () => {
-    if (clientId.trim()) {
-      // Update client ID if provided
-      // In a real implementation, you'd update the Spotify service config
-    }
-    
-    const result = await login();
+    const result = await login(clientId.trim() || null);
     if (!result.success) {
       console.error('Login failed:', result.error);
     }
