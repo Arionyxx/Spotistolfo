@@ -30,6 +30,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Event listeners
   onAuthenticated: (callback) => ipcRenderer.on('spotify:authenticated', callback),
   onDownloadProgress: (callback) => ipcRenderer.on('download:progress', callback),
+  onAuthCallback: (callback) => ipcRenderer.on('spotify:auth-callback', (event, data) => {
+    console.log('Preload: Auth callback listener triggered');
+    callback(data);
+  }),
   
   // Remove listeners
   removeAllListeners: (channel) => ipcRenderer.removeAllListeners(channel)

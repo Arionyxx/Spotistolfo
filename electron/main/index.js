@@ -60,6 +60,37 @@ class SpotiLoaderApp {
       app.setAsDefaultProtocolClient('spotloader');
     }
 
+    // Handle single instance lock
+    const gotTheLock = app.requestSingleInstanceLock();
+    if (!gotTheLock) {
+      app.quit();
+      return;
+    }
+
+    app.on('second-instance', (event, commandLine) => {
+      if (this.mainWindow) {
+        if (this.mainWindow.isMinimized()) this.mainWindow.restore();
+        this.mainWindow.focus();
+        
+        // Protocol handler for Windows
+        // commandLine is an array of strings that contains the second instance's parameters
+        const url = commandLine.find(arg => arg.startsWith('spotloader://'));
+        if (url) {
+          console.log('Second instance protocol URL:', url);
+          try {
+            const urlObj = new URL(url);
+            const code = urlObj.searchParams.get('code');
+            const state = urlObj.searchParams.get('state');
+            if (code) {
+              this.mainWindow.webContents.send('spotify:auth-callback', { code, state });
+            }
+          } catch (error) {
+            console.error('Error parsing second instance URL:', error);
+          }
+        }
+      }
+    });
+
     // electron-reload is optional for development
     try {
       require('electron-reload')(__dirname, {
@@ -91,10 +122,28 @@ class SpotiLoaderApp {
     // Handle the custom protocol callback
     app.on('open-url', (event, url) => {
       event.preventDefault();
-      // Extract auth code from URL: spotloader://callback?code=...
-      const code = new URL(url).searchParams.get('code');
-      if (code && this.mainWindow) {
-        this.mainWindow.webContents.send('spotify:auth-callback', { code });
+      console.log('Protocol URL received:', url);
+      
+      try {
+        const urlObj = new URL(url);
+        const code = urlObj.searchParams.get('code');
+        const state = urlObj.searchParams.get('state');
+        
+        console.log('Auth code extracted:', code);
+        console.log('State:', state);
+        
+        if (code && this.mainWindow) {
+          console.log('Sending auth callback to renderer');
+          this.mainWindow.webContents.send('spotify:auth-callback', { code, state });
+          
+          // Focus the window
+          if (this.mainWindow.isMinimized()) this.mainWindow.restore();
+          this.mainWindow.focus();
+        } else {
+          console.error('No code or window found');
+        }
+      } catch (error) {
+        console.error('Error handling protocol URL:', error);
       }
     });
   }

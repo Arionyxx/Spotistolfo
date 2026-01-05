@@ -105,7 +105,11 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       setLoading(true);
       
+      console.log('Handling Spotify callback with code:', code);
+      
       const result = await window.electronAPI.handleCallback(code);
+      
+      console.log('Callback result:', result);
       
       if (result.success) {
         // Get user data after successful authentication
@@ -166,6 +170,16 @@ export const AuthProvider = ({ children }) => {
   // Set up auth state change listeners
   useEffect(() => {
     if (window.electronAPI) {
+      // Listen for auth callback from custom protocol
+      const handleAuthCallback = (data) => {
+        console.log('Auth callback received:', data);
+        if (data.code) {
+          handleCallback(data.code);
+        }
+      };
+
+      window.electronAPI.onAuthCallback(handleAuthCallback);
+
       const handleAuthenticated = (event, data) => {
         setUser(data.user);
         window.electronAPI.storeSet('user', data.user);
@@ -174,10 +188,11 @@ export const AuthProvider = ({ children }) => {
       window.electronAPI.onAuthenticated(handleAuthenticated);
 
       return () => {
+        window.electronAPI.removeAllListeners('spotify:auth-callback');
         window.electronAPI.removeAllListeners('spotify:authenticated');
       };
     }
-  }, []);
+  }, [handleCallback]);
 
   const value = {
     user,
