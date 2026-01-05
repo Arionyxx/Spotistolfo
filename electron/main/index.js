@@ -36,6 +36,15 @@ class SpotiLoaderApp {
   }
 
   setupApp() {
+    // Register the custom protocol
+    if (process.defaultApp) {
+      if (process.argv.length >= 2) {
+        app.setAsDefaultProtocolClient('spotloader', process.execPath, [path.resolve(process.argv[1])]);
+      }
+    } else {
+      app.setAsDefaultProtocolClient('spotloader');
+    }
+
     // Enable live reload for development
     if (process.env.NODE_ENV === 'development') {
       try {
@@ -62,6 +71,16 @@ class SpotiLoaderApp {
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) {
         this.createMainWindow();
+      }
+    });
+
+    // Handle the custom protocol callback
+    app.on('open-url', (event, url) => {
+      event.preventDefault();
+      // Extract auth code from URL: spotloader://callback?code=...
+      const code = new URL(url).searchParams.get('code');
+      if (code && this.mainWindow) {
+        this.mainWindow.webContents.send('spotify:auth-callback', { code });
       }
     });
   }

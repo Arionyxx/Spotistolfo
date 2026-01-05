@@ -114,10 +114,10 @@ spotloader/
    ```
 
 3. **Set up Spotify App**
-   - Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-   - Create a new app
-   - Get your Client ID and Client Secret
-   - Set redirect URI to `http://localhost:3000/callback`
+    - Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+    - Create a new app
+    - Get your Client ID and Client Secret
+    - Set redirect URI to `spotloader://callback`
 
 4. **Configure Environment**
    ```bash

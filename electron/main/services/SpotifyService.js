@@ -3,7 +3,7 @@ import crypto from 'crypto';
 export class SpotifyService {
   constructor() {
     this.clientId = process.env.SPOTIFY_CLIENT_ID || 'your-client-id-here';
-    this.redirectUri = 'http://localhost:3000/callback';
+    this.redirectUri = 'spotloader://callback';
     this.scopes = [
       'playlist-read-private',
       'playlist-read-collaborative',
