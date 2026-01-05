@@ -1,9 +1,9 @@
 {
   "name": "spotloader",
   "version": "1.0.0",
-  "description": "A modern desktop app for exporting Spotify playlists as MP3s",
-  "main": "electron/main/index.js",
   "type": "module",
+  "main": "electron/main/index.js",
+  "description": "SpotiLoader - Spotify to MP3 Desktop App",
   "scripts": {
     "dev": "concurrently \"npm run dev:react\" \"npm run dev:electron\"",
     "dev:react": "vite",
@@ -31,7 +31,7 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.3",
     "vite": "^4.4.5",
-    "electron": "^27.0.0",
+    "electron": "^28.0.0",
     "electron-builder": "^24.6.4",
     "concurrently": "^8.2.0",
     "wait-on": "^7.0.1",

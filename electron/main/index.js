@@ -1,11 +1,13 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 import { SpotifyService } from './services/SpotifyService.js';
 import { Downloader } from './services/Downloader.js';
 import { Tagger } from './services/Tagger.js';
 import Store from 'electron-store';
 
+const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
