@@ -20,6 +20,7 @@ const store = new Store({
     userId: null,
     playlists: [],
     downloadHistory: [],
+    tempClientId: null,
     userSettings: {
       downloadPath: '',
       autoRename: true,
@@ -179,6 +180,25 @@ class SpotiLoaderApp {
         await shell.openExternal(authUrl);
         return { success: true };
       } catch (error) {
+        return { success: false, error: error.message };
+      }
+    });
+
+    ipcMain.handle('spotify:loginWithClientId', async (event, clientId) => {
+      try {
+        if (!clientId) {
+          return { success: false, error: 'Client ID is required' };
+        }
+
+        console.log('Logging in with Client ID:', clientId);
+        this.spotifyService.setClientId(clientId);
+
+        const authUrl = await this.spotifyService.getAuthUrl();
+        await shell.openExternal(authUrl);
+
+        return { success: true };
+      } catch (error) {
+        console.error('Login error:', error);
         return { success: false, error: error.message };
       }
     });

@@ -5,6 +5,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('electronAPI', {
   // Auth methods
   login: () => ipcRenderer.invoke('spotify:login'),
+  loginWithClientId: (clientId) => ipcRenderer.invoke('spotify:loginWithClientId', clientId),
   handleCallback: (code) => ipcRenderer.invoke('spotify:callback', code),
   getUser: () => ipcRenderer.invoke('spotify:getUser'),
   

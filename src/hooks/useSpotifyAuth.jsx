@@ -43,13 +43,50 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = useCallback(async () => {
+  const login = useCallback(async (manualClientId = null) => {
     try {
       setError(null);
-      const result = await window.electronAPI.login();
+      setLoading(true);
+      
+      // First, try to use manual Client ID, then settings
+      let clientId = manualClientId;
+      
+      if (!clientId) {
+        try {
+          const result = await window.electronAPI.storeGet('userSettings');
+          clientId = result?.value?.spotifyClientId;
+          
+          // If not in settings, check tempClientId as well
+          if (!clientId) {
+            const tempResult = await window.electronAPI.storeGet('tempClientId');
+            clientId = tempResult?.value;
+          }
+        } catch (err) {
+          console.error('Failed to read settings:', err);
+        }
+      }
+      
+      // If no Client ID, ask user to enter it
+      if (!clientId) {
+        // Create a simple prompt for Client ID
+        clientId = prompt('Please enter your Spotify Client ID:');
+        
+        if (!clientId) {
+          throw new Error('Spotify Client ID is required');
+        }
+        
+        // Save it for future use
+        try {
+          await window.electronAPI.storeSet('tempClientId', clientId);
+        } catch (err) {
+          console.error('Failed to save Client ID:', err);
+        }
+      }
+      
+      // Now trigger login with the Client ID
+      const result = await window.electronAPI.loginWithClientId(clientId);
 
       if (result.success) {
-        // Main process handles opening the browser with auth URL
         return { success: true };
       } else {
         throw new Error(result.error || 'Failed to initiate login');
@@ -58,6 +95,8 @@ export const AuthProvider = ({ children }) => {
       console.error('Login error:', err);
       setError(err.message);
       return { success: false, error: err.message };
+    } finally {
+      setLoading(false);
     }
   }, []);
 
