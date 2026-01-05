@@ -24,6 +24,23 @@ const store = new Store({
       downloadPath: null,
       autoRename: true,
       audioQuality: 'high'
+    },
+    userSettings: {
+      downloadPath: '',
+      autoRename: true,
+      audioQuality: 'high',
+      concurrentDownloads: 3,
+      autoRefreshToken: true,
+      notifications: true,
+      darkMode: true,
+      spotifyClientId: '',
+      spotifyClientSecret: '',
+      youtubeApiKey: '',
+      downloadHistory: true,
+      metadataTagging: true,
+      albumArtDownload: true,
+      retryFailed: true,
+      maxRetries: 3
     }
   }
 });
@@ -145,20 +162,23 @@ class SpotiLoaderApp {
     // Auth handlers
     ipcMain.handle('spotify:login', async () => {
       try {
-        // Get client ID from store
+        // Get client ID from store (store.get is synchronous!)
         const userSettings = store.get('userSettings');
         const clientId = userSettings?.spotifyClientId;
-        
+
+        console.log('User settings:', userSettings);
+        console.log('Client ID:', clientId);
+
         if (!clientId) {
-          return { 
-            success: false, 
-            error: 'Spotify Client ID not configured. Please set it in Settings first.' 
+          return {
+            success: false,
+            error: 'Spotify Client ID not configured. Please set it in Settings first.'
           };
         }
-        
+
         // Set the client ID on the service
         this.spotifyService.setClientId(clientId);
-        
+
         const authUrl = await this.spotifyService.getAuthUrl();
         // Open the authorization URL in external browser
         await shell.openExternal(authUrl);
@@ -172,6 +192,10 @@ class SpotiLoaderApp {
       try {
         const userSettings = store.get('userSettings');
         const clientId = userSettings?.spotifyClientId;
+
+        console.log('Callback - User settings:', userSettings);
+        console.log('Callback - Client ID:', clientId);
+
         if (clientId) {
           this.spotifyService.setClientId(clientId);
         }
@@ -180,14 +204,14 @@ class SpotiLoaderApp {
         store.set('authToken', tokenData.access_token);
         store.set('refreshToken', tokenData.refresh_token);
         store.set('userId', tokenData.user_id);
-        
+
         if (this.mainWindow) {
           this.mainWindow.webContents.send('spotify:authenticated', {
             access_token: tokenData.access_token,
             user: tokenData.user
           });
         }
-        
+
         return { success: true };
       } catch (error) {
         return { success: false, error: error.message };
@@ -200,9 +224,13 @@ class SpotiLoaderApp {
         if (!token) {
           throw new Error('No authentication token found');
         }
-        
+
         const userSettings = store.get('userSettings');
         const clientId = userSettings?.spotifyClientId;
+
+        console.log('GetUser - User settings:', userSettings);
+        console.log('GetUser - Client ID:', clientId);
+
         if (clientId) {
           this.spotifyService.setClientId(clientId);
         }
@@ -221,18 +249,22 @@ class SpotiLoaderApp {
         if (!token) {
           throw new Error('Not authenticated');
         }
-        
+
         const userSettings = store.get('userSettings');
         const clientId = userSettings?.spotifyClientId;
+
+        console.log('GetPlaylists - User settings:', userSettings);
+        console.log('GetPlaylists - Client ID:', clientId);
+
         if (clientId) {
           this.spotifyService.setClientId(clientId);
         }
 
         const playlists = await this.spotifyService.getPlaylists(token);
-        
+
         // Update store with playlist data
         store.set('playlists', playlists);
-        
+
         return { success: true, playlists };
       } catch (error) {
         return { success: false, error: error.message };
@@ -245,9 +277,13 @@ class SpotiLoaderApp {
         if (!token) {
           throw new Error('Not authenticated');
         }
-        
+
         const userSettings = store.get('userSettings');
         const clientId = userSettings?.spotifyClientId;
+
+        console.log('GetPlaylistTracks - User settings:', userSettings);
+        console.log('GetPlaylistTracks - Client ID:', clientId);
+
         if (clientId) {
           this.spotifyService.setClientId(clientId);
         }
@@ -363,6 +399,7 @@ class SpotiLoaderApp {
     ipcMain.handle('store:get', async (event, key) => {
       try {
         const value = store.get(key);
+        console.log(`Store get - key: '${key}', value:`, value);
         return { success: true, value };
       } catch (error) {
         return { success: false, error: error.message };
@@ -371,6 +408,7 @@ class SpotiLoaderApp {
 
     ipcMain.handle('store:set', async (event, key, value) => {
       try {
+        console.log(`Store set - key: '${key}', value:`, value);
         store.set(key, value);
         return { success: true };
       } catch (error) {
