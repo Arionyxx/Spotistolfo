@@ -47,11 +47,9 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       const result = await window.electronAPI.login();
-      
-      if (result.success && result.authUrl) {
-        // Open authorization URL in external browser
-        const { shell } = await import('electron');
-        await shell.openExternal(result.authUrl);
+
+      if (result.success) {
+        // Main process handles opening the browser with auth URL
         return { success: true };
       } else {
         throw new Error(result.error || 'Failed to initiate login');

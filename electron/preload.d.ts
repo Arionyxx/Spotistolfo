@@ -2,7 +2,7 @@
 declare global {
   interface Window {
     electronAPI: {
-      login: () => Promise<{ success: boolean; authUrl?: string; error?: string }>;
+      login: () => Promise<{ success: boolean; error?: string }>;
       handleCallback: (code: string) => Promise<{ success: boolean; error?: string }>;
       getUser: () => Promise<{ success: boolean; user?: any; error?: string }>;
       getPlaylists: () => Promise<{ success: boolean; playlists?: any[]; error?: string }>;

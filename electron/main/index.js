@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
@@ -146,7 +146,9 @@ class SpotiLoaderApp {
     ipcMain.handle('spotify:login', async () => {
       try {
         const authUrl = await this.spotifyService.getAuthUrl();
-        return { success: true, authUrl };
+        // Open the authorization URL in external browser
+        await shell.openExternal(authUrl);
+        return { success: true };
       } catch (error) {
         return { success: false, error: error.message };
       }
