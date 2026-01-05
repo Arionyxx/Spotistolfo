@@ -20,11 +20,6 @@ const store = new Store({
     userId: null,
     playlists: [],
     downloadHistory: [],
-    settings: {
-      downloadPath: null,
-      autoRename: true,
-      audioQuality: 'high'
-    },
     userSettings: {
       downloadPath: '',
       autoRename: true,
@@ -396,22 +391,25 @@ class SpotiLoaderApp {
     });
 
     // Storage handlers
-    ipcMain.handle('store:get', async (event, key) => {
+    ipcMain.handle('store:set', async (event, key, value) => {
       try {
-        const value = store.get(key);
-        console.log(`Store get - key: '${key}', value:`, value);
-        return { success: true, value };
+        console.log(`Saving to store - Key: ${key}`, value);
+        store.set(key, value);
+        console.log(`Successfully saved to store - Key: ${key}`);
+        return { success: true };
       } catch (error) {
+        console.error(`Failed to save to store - Key: ${key}`, error);
         return { success: false, error: error.message };
       }
     });
 
-    ipcMain.handle('store:set', async (event, key, value) => {
+    ipcMain.handle('store:get', async (event, key) => {
       try {
-        console.log(`Store set - key: '${key}', value:`, value);
-        store.set(key, value);
-        return { success: true };
+        const value = store.get(key);
+        console.log(`Retrieved from store - Key: ${key}`, value);
+        return { success: true, value };
       } catch (error) {
+        console.error(`Failed to get from store - Key: ${key}`, error);
         return { success: false, error: error.message };
       }
     });
@@ -433,7 +431,7 @@ class SpotiLoaderApp {
         });
         
         if (!result.canceled && result.filePaths.length > 0) {
-          store.set('settings.downloadPath', result.filePaths[0]);
+          store.set('userSettings.downloadPath', result.filePaths[0]);
           return { success: true, path: result.filePaths[0] };
         }
         
@@ -445,12 +443,12 @@ class SpotiLoaderApp {
 
     ipcMain.handle('dialog:getDownloadPath', async () => {
       try {
-        let downloadPath = store.get('settings.downloadPath');
+        let downloadPath = store.get('userSettings.downloadPath');
         
         if (!downloadPath) {
           // Use default Downloads folder
           downloadPath = app.getPath('downloads');
-          store.set('settings.downloadPath', downloadPath);
+          store.set('userSettings.downloadPath', downloadPath);
         }
         
         return { success: true, path: downloadPath };

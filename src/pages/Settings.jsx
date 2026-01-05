@@ -40,6 +40,7 @@ const Settings = () => {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('downloads');
   const [hasChanges, setHasChanges] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadSettings();
@@ -50,15 +51,10 @@ const Settings = () => {
       setLoading(true);
       
       // Load settings from electron-store
-      const downloadPathResult = await window.electronAPI.storeGet('settings.downloadPath');
       const userSettingsResult = await window.electronAPI.storeGet('userSettings');
       
       if (userSettingsResult.success && userSettingsResult.value) {
         setSettings(prev => ({ ...prev, ...userSettingsResult.value }));
-      }
-      
-      if (downloadPathResult.success && downloadPathResult.value) {
-        setSettings(prev => ({ ...prev, downloadPath: downloadPathResult.value }));
       }
     } catch (error) {
       console.error('Failed to load settings:', error);
@@ -75,16 +71,31 @@ const Settings = () => {
   const saveSettings = async () => {
     try {
       setSaving(true);
+      setError(null);
+      
+      console.log('Attempting to save settings:', settings);
+      
+      // Validate that we have at least a client ID if it was entered
+      if (settings.spotifyClientId) {
+        console.log('Client ID to save:', settings.spotifyClientId);
+      }
       
       // Save to electron-store
-      await window.electronAPI.storeSet('userSettings', settings);
+      const result = await window.electronAPI.storeSet('userSettings', settings);
+      
+      if (result && result.success === false) {
+        throw new Error(result.error || 'Failed to save settings');
+      }
+      
+      // Verify the save by immediately reading it back
+      const readResult = await window.electronAPI.storeGet('userSettings');
+      console.log('Verified saved data:', readResult.value);
       
       setHasChanges(false);
-      
-      // Show success message (in a real app, you'd use a toast)
-      console.log('Settings saved successfully');
+      console.log('✓ Settings saved successfully');
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      console.error('✗ Failed to save settings:', error);
+      setError(error.message || 'Failed to save settings');
     } finally {
       setSaving(false);
     }
@@ -216,6 +227,17 @@ const Settings = () => {
         {/* Content */}
         <div className="flex-1 overflow-auto">
           <div className="p-6">
+            {/* Error Message */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="mb-6 p-4 bg-red-500 bg-opacity-10 border border-red-500 rounded-lg text-red-500 text-sm"
+              >
+                {error}
+              </motion.div>
+            )}
+
             {/* Downloads Tab */}
             {activeTab === 'downloads' && (
               <motion.div
