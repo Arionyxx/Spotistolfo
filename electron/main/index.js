@@ -38,10 +38,6 @@ class SpotiLoaderApp {
   }
 
   setupApp() {
-    // Debug: Log the NODE_ENV value
-    console.log('NODE_ENV:', process.env.NODE_ENV);
-    console.log('VITE_DEV:', process.env.VITE_DEV);
-
     // Register the custom protocol
     if (process.defaultApp) {
       if (process.argv.length >= 2) {
@@ -51,23 +47,19 @@ class SpotiLoaderApp {
       app.setAsDefaultProtocolClient('spotloader');
     }
 
-    // Enable live reload for development
-    const isDev = process.env.NODE_ENV === 'development' || process.env.VITE_DEV === 'true';
-
-    if (isDev) {
-      console.log('Development mode detected, setting up hot reload');
-      try {
-        require('electron-reload')(__dirname, {
-          electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron'),
-          hardResetMethod: 'exit'
-        });
-      } catch (error) {
-        console.warn('electron-reload not available:', error.message);
-      }
+    // electron-reload is optional for development
+    try {
+      require('electron-reload')(__dirname, {
+        electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron'),
+        hardResetMethod: 'exit'
+      });
+    } catch (error) {
+      // electron-reload not critical, dev server has HMR
+      console.log('Hot reload not available, using Vite HMR instead');
     }
 
-    app.whenReady().then(() => {
-      this.createMainWindow();
+    app.whenReady().then(async () => {
+      await this.createMainWindow();
       this.setupIpcHandlers();
     });
 
@@ -77,9 +69,9 @@ class SpotiLoaderApp {
       }
     });
 
-    app.on('activate', () => {
+    app.on('activate', async () => {
       if (BrowserWindow.getAllWindows().length === 0) {
-        this.createMainWindow();
+        await this.createMainWindow();
       }
     });
 
@@ -94,7 +86,7 @@ class SpotiLoaderApp {
     });
   }
 
-  createMainWindow() {
+  async createMainWindow() {
     this.mainWindow = new BrowserWindow({
       width: 1400,
       height: 900,
@@ -115,20 +107,38 @@ class SpotiLoaderApp {
       this.mainWindow.show();
     });
 
-    // Debug: Log the NODE_ENV value
-    console.log('NODE_ENV:', process.env.NODE_ENV);
+    // Check if dev server is running
+    const devServerUrl = 'http://localhost:5173';
+    const isDevServerRunning = await this.checkDevServer(devServerUrl);
 
-    // Check for development mode
-    const isDev = process.env.NODE_ENV === 'development' || process.env.VITE_DEV === 'true';
-
-    if (isDev) {
-      console.log('Loading from dev server: http://localhost:5173');
-      this.mainWindow.loadURL('http://localhost:5173');
+    if (isDevServerRunning) {
+      console.log('Dev server detected, loading from:', devServerUrl);
+      this.mainWindow.loadURL(devServerUrl);
       this.mainWindow.webContents.openDevTools();
     } else {
-      console.log('Loading from dist:', path.join(__dirname, '../../dist/index.html'));
+      console.log('Dev server not found, loading from dist');
       this.mainWindow.loadFile(path.join(__dirname, '../../dist/index.html'));
     }
+  }
+
+  // Helper to check if dev server is running
+  checkDevServer(url) {
+    return new Promise((resolve) => {
+      const http = require('http');
+      const req = http.get(url, { timeout: 2000 }, () => {
+        req.destroy();
+        resolve(true);
+      });
+
+      req.on('error', () => {
+        resolve(false);
+      });
+
+      req.on('timeout', () => {
+        req.destroy();
+        resolve(false);
+      });
+    });
   }
 
   setupIpcHandlers() {
