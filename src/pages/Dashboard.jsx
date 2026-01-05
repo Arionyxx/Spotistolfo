@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Grid, List, Search, Filter } from 'lucide-react';
 import PlaylistCard from '../components/PlaylistCard';
-import { useAuth } from '../hooks/useSpotifyAuth';
-import { useDownload } from '../hooks/useDownloader';
+import { useAuth } from '../hooks/useSpotifyAuth.jsx';
+import { useDownload } from '../hooks/useDownloader.jsx';
 
 const Dashboard = () => {
   const { user } = useAuth();

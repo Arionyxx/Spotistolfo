@@ -9,8 +9,8 @@ import {
   Download,
   MoreHorizontal
 } from 'lucide-react';
-import { useAuth } from '../hooks/useSpotifyAuth';
-import { useDownload } from '../hooks/useDownloader';
+import { useAuth } from '../hooks/useSpotifyAuth.jsx';
+import { useDownload } from '../hooks/useDownloader.jsx';
 
 const Header = ({ user, onSidebarToggle, sidebarCollapsed }) => {
   const { logout } = useAuth();

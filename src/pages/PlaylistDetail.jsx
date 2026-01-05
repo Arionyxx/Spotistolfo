@@ -15,8 +15,8 @@ import {
 import SongRow from '../components/SongRow';
 import ProgressBar, { BatchProgressBar } from '../components/ProgressBar';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { useAuth } from '../hooks/useSpotifyAuth';
-import { useDownload } from '../hooks/useDownloader';
+import { useAuth } from '../hooks/useSpotifyAuth.jsx';
+import { useDownload } from '../hooks/useDownloader.jsx';
 
 const PlaylistDetail = () => {
   const { id } = useParams();
