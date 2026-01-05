@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 
 export class SpotifyService {
-  constructor() {
-    this.clientId = process.env.SPOTIFY_CLIENT_ID || 'your-client-id-here';
+  constructor(clientId = null) {
+    this.clientId = clientId || process.env.SPOTIFY_CLIENT_ID || null;
     this.redirectUri = 'spotloader://callback';
     this.scopes = [
       'playlist-read-private',
@@ -10,6 +10,10 @@ export class SpotifyService {
       'user-read-private',
       'user-read-email'
     ];
+  }
+
+  setClientId(clientId) {
+    this.clientId = clientId;
   }
 
   // Generate PKCE code challenge
@@ -36,6 +40,10 @@ export class SpotifyService {
   }
 
   async getAuthUrl() {
+    if (!this.clientId) {
+      throw new Error('Spotify Client ID not configured. Please set it in Settings.');
+    }
+
     const { codeChallenge } = this.generateCodeChallenge();
     const state = this.generateCodeVerifier();
     
