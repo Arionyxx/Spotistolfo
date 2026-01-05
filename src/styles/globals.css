@@ -1,0 +1,190 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --spotify-green: #1DB954;
+  --spotify-green-dark: #1ed760;
+  --spotify-black: #121212;
+  --spotify-gray-dark: #191414;
+  --spotify-gray-medium: #2e2e2e;
+  --spotify-gray-light: #b3b3b3;
+  --spotify-white: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--spotify-black);
+  color: var(--spotify-white);
+  overflow: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--spotify-gray-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--spotify-gray-medium);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--spotify-gray-light);
+}
+
+/* Glassmorphism utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Custom components */
+@layer components {
+  .btn-primary {
+    @apply bg-spotify-green hover:bg-spotify-green-dark text-black font-medium py-2 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-spotify-green focus:ring-offset-2 focus:ring-offset-spotify-black;
+  }
+  
+  .btn-secondary {
+    @apply bg-spotify-gray-medium hover:bg-spotify-gray-light text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-spotify-gray-medium focus:ring-offset-2 focus:ring-offset-spotify-black;
+  }
+  
+  .card {
+    @apply bg-spotify-gray-dark rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-200;
+  }
+  
+  .playlist-card {
+    @apply card cursor-pointer transform hover:scale-105 hover:bg-spotify-gray-medium;
+  }
+  
+  .input-field {
+    @apply bg-spotify-gray-dark border border-spotify-gray-medium text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-spotify-green focus:border-transparent;
+  }
+  
+  .sidebar-item {
+    @apply flex items-center space-x-3 px-4 py-3 text-spotify-gray-light hover:text-white hover:bg-spotify-gray-dark rounded-lg transition-all duration-200 cursor-pointer;
+  }
+  
+  .sidebar-item.active {
+    @apply text-white bg-spotify-green bg-opacity-20;
+  }
+  
+  .song-row {
+    @apply flex items-center space-x-4 p-3 hover:bg-spotify-gray-dark rounded-lg transition-all duration-200;
+  }
+  
+  .progress-bar {
+    @apply w-full bg-spotify-gray-medium rounded-full h-2 overflow-hidden;
+  }
+  
+  .progress-fill {
+    @apply h-full bg-spotify-green transition-all duration-300 ease-out;
+  }
+}
+
+/* Loading animations */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+/* Utility animations */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+/* Focus styles for accessibility */
+.focus-visible:focus {
+  outline: 2px solid var(--spotify-green);
+  outline-offset: 2px;
+}
+
+/* Text selection */
+::selection {
+  background: var(--spotify-green);
+  color: black;
+}
+
+/* Image loading placeholder */
+.image-placeholder {
+  background: linear-gradient(45deg, var(--spotify-gray-dark), var(--spotify-gray-medium));
+  background-size: 400% 400%;
+  animation: gradient 3s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .mobile-hidden {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none;
+  }
+}

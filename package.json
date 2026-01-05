@@ -1,0 +1,72 @@
+{
+  "name": "spotloader",
+  "version": "1.0.0",
+  "description": "A modern desktop app for exporting Spotify playlists as MP3s",
+  "main": "electron/main/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:react\" \"npm run dev:electron\"",
+    "dev:react": "vite",
+    "dev:electron": "wait-on tcp:5173 && electron .",
+    "build": "npm run build:react && npm run build:electron",
+    "build:react": "vite build",
+    "build:electron": "electron-builder",
+    "start": "electron .",
+    "lint": "eslint src --ext .js,.jsx",
+    "format": "prettier --write src"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.8.0",
+    "framer-motion": "^10.16.0",
+    "lucide-react": "^0.294.0",
+    "electron-store": "^8.1.0",
+    "music-metadata-browser": "^2.5.10",
+    "ytdl-core": "^4.11.5",
+    "axios": "^1.6.0",
+    "node-fetch": "^3.3.2",
+    "fs-extra": "^11.1.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.3",
+    "vite": "^4.4.5",
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4",
+    "concurrently": "^8.2.0",
+    "wait-on": "^7.0.1",
+    "electron-reload": "^2.0.0",
+    "@types/node": "^20.8.0",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react": "^7.32.2",
+    "prettier": "^3.0.0",
+    "autoprefixer": "^10.4.15",
+    "postcss": "^8.4.28",
+    "tailwindcss": "^3.3.3"
+  },
+  "build": {
+    "appId": "com.spotloader.app",
+    "productName": "SpotiLoader",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.entertainment"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
